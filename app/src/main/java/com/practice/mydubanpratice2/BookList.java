@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -11,6 +12,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.RatingBar;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,10 +71,47 @@ public class BookList extends Activity {
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+        public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_book_list, container, false);
             final JSONObject books = readDataFromFile();
+
+            final ListView bookList = (ListView) rootView.findViewById(R.id.bookList);
+
+            bookList.setAdapter(new BaseAdapter() {
+                @Override
+                public int getCount() {
+                    return books.optJSONArray("books").length();
+                }
+
+                @Override
+                public JSONObject getItem(int position) {
+                    return (JSONObject) books.optJSONArray("books").opt(position);
+                }
+
+                @Override
+                public long getItemId(int position) {
+                    return 0;
+                }
+
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+                    final View bookView = inflater.inflate(R.layout.list_item_book, parent, false);
+                    final ImageView bookCover = (ImageView) bookView.findViewById(R.id.bookCover);
+                    final TextView bookName = (TextView) bookView.findViewById(R.id.bookName);
+                    final RatingBar rating = (RatingBar) bookView.findViewById(R.id.rating);
+                    final TextView bookInfo = (TextView) bookView.findViewById(R.id.bookInfo);
+
+                    final JSONObject book = getItem(position);
+                    bookName.setText(book.optString("title"));
+                    rating.setRating((float) (book.optJSONObject("rating").optDouble("average") / 2));
+                    bookInfo.setText(TextUtils.join("/", new String[]{
+                            book.optJSONArray("author").optString(0),
+                            book.optString("publisher"),
+                            book.optString("pubdate")}));
+                    return bookView;
+                }
+            });
             return rootView;
         }
 
