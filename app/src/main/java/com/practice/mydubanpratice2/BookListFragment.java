@@ -99,7 +99,7 @@ public class BookListFragment extends Fragment {
 
             final Book book = getItem(position);
 
-en            new AsyncTask<String, Void, Bitmap>() {
+            new AsyncTask<String, Void, Bitmap>() {
                 @Override
                 protected Bitmap doInBackground(String... params) {
                     final String url = params[0];
