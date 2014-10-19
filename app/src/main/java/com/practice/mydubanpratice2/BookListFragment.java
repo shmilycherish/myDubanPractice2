@@ -99,28 +99,17 @@ public class BookListFragment extends Fragment {
 
             final Book book = getItem(position);
 
-            new AsyncTask<String, Void, Bitmap>() {
-                @Override
-                protected Bitmap doInBackground(String... params) {
-                    final String url = params[0];
-                    try {
-                        final URL imageUrl = new URL(url);
-                        final HttpURLConnection urlConnection = (HttpURLConnection) imageUrl.openConnection();
-                        final InputStream inputStream = urlConnection.getInputStream();
-                        return BitmapFactory.decodeStream(inputStream);
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
+            final String imageUrl = book.getImage();
+            viewHolder.bookCover.setTag(imageUrl.hashCode());
 
+            ImageLoader.loadImage(imageUrl, new ImageLoader.ImageLoaderListener() {
                 @Override
-                protected void onPostExecute(Bitmap bitmap) {
-                    viewHolder.bookCover.setImageBitmap(bitmap);
+                public void onImageLoad(Bitmap bitmap) {
+                    if (bitmap != null && viewHolder.bookCover.getTag().equals(imageUrl.hashCode())) {
+                        viewHolder.bookCover.setImageBitmap(bitmap);
+                    }
                 }
-            }.execute(book.getImage());
+            });
             viewHolder.bookName.setText(book.getTitle());
             viewHolder.rating.setRating((float) (book.getRating() / 2));
             viewHolder.bookInfo.setText(book.getInformation());
