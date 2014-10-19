@@ -10,6 +10,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class DataFetcher {
 
@@ -35,5 +38,30 @@ public class DataFetcher {
         }
         return null;
 
+    }
+
+    public static JSONObject fetcherDataFromInternet(String urlStr) {
+        JSONObject json = null;
+        try {
+            final URL url = new URL(urlStr);
+
+            final HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            String line = null;
+            final StringBuffer stringBuffer = new StringBuffer();
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuffer.append(line);
+            }
+            bufferedReader.close();
+            json = new JSONObject(stringBuffer.toString());
+
+        } catch (MalformedURLException e) {
+            Log.e(READ_DATA, e.getLocalizedMessage(), e);
+        } catch (IOException e) {
+            Log.e(READ_DATA, e.getLocalizedMessage(), e);
+        } catch (JSONException e) {
+            Log.e(READ_DATA, e.getLocalizedMessage(), e);
+        }
+        return json;
     }
 }
