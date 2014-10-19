@@ -3,6 +3,7 @@ package com.practice.mydubanpratice2;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,11 +26,23 @@ public class BookListFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_book_list, container, false);
-        final List<Book> books = new Books().getBooks(DataFetcher.readDataFromFile(getActivity()));
 
         final ListView bookList = (ListView) rootView.findViewById(R.id.bookList);
 
-        bookList.setAdapter(new MyBookListAdapter(books, getActivity()));
+        new AsyncTask<String, Void, List<Book>>() {
+
+            @Override
+            protected List<Book> doInBackground(String... params) {
+                final String url = params[0];
+                return new Books().getBooks(DataFetcher.fetcherDataFromInternet(url));
+            }
+
+            @Override
+            protected void onPostExecute(List<Book> books) {
+                super.onPostExecute(books);
+                bookList.setAdapter(new MyBookListAdapter(books, getActivity()));
+            }
+        }.execute("https://api.douban.com/v2/book/search?tag=%E8%AE%A1%E7%AE%97%E6%9C%BA");
         return rootView;
     }
 
