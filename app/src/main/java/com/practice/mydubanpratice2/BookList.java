@@ -3,6 +3,7 @@ package com.practice.mydubanpratice2;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -103,6 +104,8 @@ public class BookList extends Activity {
                     final TextView bookInfo = (TextView) bookView.findViewById(R.id.bookInfo);
 
                     final JSONObject book = getItem(position);
+
+                    bookCover.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_default_cover));
                     bookName.setText(book.optString("title"));
                     rating.setRating((float) (book.optJSONObject("rating").optDouble("average") / 2));
                     bookInfo.setText(TextUtils.join("/", new String[]{
