@@ -2,6 +2,7 @@ package com.practice.mydubanpratice2;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,6 +15,12 @@ import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 
 public class BookListFragment extends Fragment {
@@ -92,7 +99,28 @@ public class BookListFragment extends Fragment {
 
             final Book book = getItem(position);
 
-            viewHolder.bookCover.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_default_cover));
+en            new AsyncTask<String, Void, Bitmap>() {
+                @Override
+                protected Bitmap doInBackground(String... params) {
+                    final String url = params[0];
+                    try {
+                        final URL imageUrl = new URL(url);
+                        final HttpURLConnection urlConnection = (HttpURLConnection) imageUrl.openConnection();
+                        final InputStream inputStream = urlConnection.getInputStream();
+                        return BitmapFactory.decodeStream(inputStream);
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Bitmap bitmap) {
+                    viewHolder.bookCover.setImageBitmap(bitmap);
+                }
+            }.execute(book.getImage());
             viewHolder.bookName.setText(book.getTitle());
             viewHolder.rating.setRating((float) (book.getRating() / 2));
             viewHolder.bookInfo.setText(book.getInformation());
