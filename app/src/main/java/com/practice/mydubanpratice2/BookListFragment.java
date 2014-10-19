@@ -61,20 +61,37 @@ public class BookListFragment extends Fragment {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            final View bookView = LayoutInflater.from(context).inflate(R.layout.list_item_book, parent, false);
-            final ImageView bookCover = (ImageView) bookView.findViewById(R.id.bookCover);
-            final TextView bookName = (TextView) bookView.findViewById(R.id.bookName);
-            final RatingBar rating = (RatingBar) bookView.findViewById(R.id.rating);
-            final TextView bookInfo = (TextView) bookView.findViewById(R.id.bookInfo);
+
+            final ViewHolder viewHolder;
+
+            if (convertView == null) {
+                viewHolder = new ViewHolder();
+                convertView = LayoutInflater.from(context).inflate(R.layout.list_item_book, parent, false);
+                viewHolder.bookCover = (ImageView) convertView.findViewById(R.id.bookCover);
+                viewHolder.bookName = (TextView) convertView.findViewById(R.id.bookName);
+                viewHolder.rating = (RatingBar) convertView.findViewById(R.id.rating);
+                viewHolder.bookInfo = (TextView) convertView.findViewById(R.id.bookInfo);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+
 
             final Book book = getItem(position);
 
-            bookCover.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_default_cover));
-            bookName.setText(book.getTitle());
-            rating.setRating((float) (book.getRating() / 2));
-            bookInfo.setText(book.getInformation());
-            return bookView;
+            viewHolder.bookCover.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_default_cover));
+            viewHolder.bookName.setText(book.getTitle());
+            viewHolder.rating.setRating((float) (book.getRating() / 2));
+            viewHolder.bookInfo.setText(book.getInformation());
+            return convertView;
         }
+    }
+
+    static class ViewHolder {
+        ImageView bookCover;
+        TextView bookName;
+        RatingBar rating;
+        TextView bookInfo;
     }
 
 }
